@@ -5,7 +5,7 @@ mod log;
 
 use parser::Parser;
 use exec::Machine;
-use stacked::*;
+use lib_stacked::*;
 
 use clap::{Parser as ClapParser, Subcommand};
 
