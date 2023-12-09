@@ -33,6 +33,7 @@ fn main() {
     match &args.command {
         Commands::Exec { file } | Commands::Disassemble { file } => {
             // TODO: remove for production
+            /*
             let mut codegen = match CodeGen::new(&file) {
                 Ok(codegen) => codegen,
                 Err(err) => {
@@ -115,6 +116,7 @@ fn main() {
                 log::error(&format!("failed to output byte code: {}", err.to_string()));
                 process::exit(1);
             }
+            */
 
             let mut parser = match Parser::new(&file) {
                 Ok(parser) => parser,

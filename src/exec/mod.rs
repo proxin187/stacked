@@ -98,6 +98,8 @@ impl Machine {
         while ip < instructions.len() as u32 {
             if self.debug {
                 log::info(&format!("Inst: {:?}", instructions[ip as usize]));
+                log::info(&format!("Stack: {:?}", self.stack));
+                log::info(&format!("Return: {:?}", self.ret_stack));
             }
 
             match &instructions[ip as usize] {
