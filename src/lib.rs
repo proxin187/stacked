@@ -18,6 +18,7 @@ pub enum ExprKind {
 pub enum Jump {
     Unconditional,
     Equal,
+    NotEqual,
     Greater,
     Lesser,
 }
@@ -129,6 +130,7 @@ impl CodeGen {
                         match condition {
                             Jump::Unconditional => 0x6A,
                             Jump::Equal =>         0x6B,
+                            Jump::NotEqual =>      0x6E,
                             Jump::Greater =>       0x6C,
                             Jump::Lesser =>        0x6D,
                         }

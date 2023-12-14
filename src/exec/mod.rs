@@ -141,6 +141,7 @@ impl Machine {
                     if match jump {
                         Jump::Unconditional => true,
                         Jump::Equal => result == 0,
+                        Jump::NotEqual => result != 0,
                         Jump::Greater => result == 1,
                         Jump::Lesser => result == 2,
                     } {

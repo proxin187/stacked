@@ -75,13 +75,13 @@ impl Parser {
 
                         0x6A => { instructions.push(Inst::Jump(Jump::Unconditional, self.from_bytes(value))); },
                         0x6B => { instructions.push(Inst::Jump(Jump::Equal, self.from_bytes(value))); },
+                        0x6E => { instructions.push(Inst::Jump(Jump::NotEqual, self.from_bytes(value))); },
                         0x6C => { instructions.push(Inst::Jump(Jump::Greater, self.from_bytes(value))); },
                         0x6D => { instructions.push(Inst::Jump(Jump::Lesser, self.from_bytes(value))); },
 
                         _ => {},
                     }
                 },
-
                 0x8C => {
                     let mut string = String::new();
 
