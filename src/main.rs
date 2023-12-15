@@ -1,3 +1,4 @@
+mod disassemble;
 mod syscall;
 mod parser;
 mod exec;
@@ -32,92 +33,6 @@ fn main() {
 
     match &args.command {
         Commands::Exec { file } | Commands::Disassemble { file } => {
-            // TODO: remove for production
-            /*
-            let mut codegen = match CodeGen::new(&file) {
-                Ok(codegen) => codegen,
-                Err(err) => {
-                    log::error(&format!("failed to initialize codegen: {}", err.to_string()));
-                    process::exit(1);
-                },
-            };
-
-            /*
-            // poke string into memory
-            for (index, character) in "Skibidi toilet only in ohio ngl\n\0".chars().enumerate() {
-                codegen.append(Inst::StackOp(StackOp::Push(character as u32)));
-                codegen.append(Inst::StackOp(StackOp::Push(index as u32)));
-                codegen.append(Inst::MemOp(MemOp::Store));
-            }
-            */
-
-            codegen.append(Inst::StackOp(StackOp::Push(0)));
-            codegen.append(Inst::MemOp(MemOp::InsertStr(String::from("Skibidi toilet, Skibidi Skibidi toilet\n\0"))));
-
-            /* PRINT
-            // count
-            codegen.append(Inst::StackOp(StackOp::Push(14)));
-            // buf (addr)
-            codegen.append(Inst::StackOp(StackOp::Push(0)));
-            // fd
-            codegen.append(Inst::StackOp(StackOp::Push(1)));
-            // syscall (write)
-            codegen.append(Inst::StackOp(StackOp::Push(1)));
-            codegen.append(Inst::Syscall);
-            */
-
-            // strlen(str)
-            codegen.append(Inst::StackOp(StackOp::Push(0)));
-            codegen.append(Inst::Call(0));
-
-            codegen.append(Inst::StackOp(StackOp::Dump));
-
-            codegen.append(Inst::Halt);
-
-            // strlen
-            codegen.append(Inst::Label(0));
-
-            codegen.append(Inst::StackOp(StackOp::Push(0)));
-
-            // while (str[idx] != '\0') {
-            codegen.append(Inst::Label(1));
-
-            // idx = idx + 1;
-            codegen.append(Inst::StackOp(StackOp::Push(1)));
-            codegen.append(Inst::BinaryExpr(ExprKind::Add));
-
-            // str[idx]
-            codegen.append(Inst::StackOp(StackOp::Swap));
-            codegen.append(Inst::StackOp(StackOp::Dup));
-            codegen.append(Inst::StackOp(StackOp::Rot));
-            codegen.append(Inst::StackOp(StackOp::Dup));
-            codegen.append(Inst::StackOp(StackOp::Rot));
-            codegen.append(Inst::StackOp(StackOp::Swap));
-
-            // addr + idx
-            codegen.append(Inst::BinaryExpr(ExprKind::Add));
-
-            // mem[addr + idx]
-            codegen.append(Inst::MemOp(MemOp::Load));
-
-
-            // str[idx] != '\0'
-            codegen.append(Inst::StackOp(StackOp::Push(0)));
-            codegen.append(Inst::StackOp(StackOp::Cmp));
-
-            // }
-            codegen.append(Inst::Jump(Jump::Equal, 2));
-            codegen.append(Inst::Jump(Jump::Unconditional, 1));
-
-            codegen.append(Inst::Label(2));
-            codegen.append(Inst::Return);
-
-            if let Err(err) = codegen.output() {
-                log::error(&format!("failed to output byte code: {}", err.to_string()));
-                process::exit(1);
-            }
-            */
-
             let mut parser = match Parser::new(&file) {
                 Ok(parser) => parser,
                 Err(err) => {
@@ -127,7 +42,7 @@ fn main() {
             };
 
             if let Commands::Exec { .. } = args.command {
-                let instructions = match parser.parse(false) {
+                let instructions = match parser.parse() {
                     Ok(instructions) => instructions,
                     Err(err) => {
                         log::error(&format!("failed to parse: {}", err.to_string()));
@@ -161,13 +76,15 @@ fn main() {
                     Ok(_) => (),
                 }
             } else {
-                match parser.parse(true) {
+                let instructions = match parser.parse() {
+                    Ok(instructions) => instructions,
                     Err(err) => {
                         log::error(&format!("failed to parse: {}", err.to_string()));
                         process::exit(1);
                     },
-                    Ok(_) => (),
-                }
+                };
+
+                disassemble::disassemble(instructions);
             }
 
         },

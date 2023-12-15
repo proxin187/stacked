@@ -27,9 +27,8 @@ impl Parser {
         }
     }
 
-    pub fn parse(&mut self, disassemble: bool) -> Result<Vec<Inst>, Box<dyn std::error::Error>> {
+    pub fn parse(&mut self) -> Result<Vec<Inst>, Box<dyn std::error::Error>> {
         let mut instructions: Vec<Inst> = Vec::new();
-        let mut disassembly = String::new();
         let mut ip = 0;
 
         loop {
@@ -40,14 +39,6 @@ impl Parser {
                 _ => {},
             }
 
-            if disassemble {
-                if !instructions.is_empty() {
-                    println!("{:040}     {}", disassembly, instructions[instructions.len() - 1]);
-                }
-
-                disassembly = format!("{:#07x}: {:#04x} ", ip, buffer[0]);
-            }
-
             match buffer[0] {
                 0x4C | 0x01 | 0x6A | 0x6B | 0x6C | 0x6D | 0x2F => {
                     let mut value = [0u8; mem::size_of::<u32>()];
@@ -55,12 +46,6 @@ impl Parser {
                     match self.reader.read_exact(&mut value) {
                         Err(_) => break,
                         _ => {},
-                    }
-
-                    if disassemble {
-                        for byte in value {
-                            disassembly += &format!("{:#04x} ", byte);
-                        }
                     }
 
                     match buffer[0] {
