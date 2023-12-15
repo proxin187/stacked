@@ -29,7 +29,6 @@ impl Parser {
 
     pub fn parse(&mut self) -> Result<Vec<Inst>, Box<dyn std::error::Error>> {
         let mut instructions: Vec<Inst> = Vec::new();
-        let mut ip = 0;
 
         loop {
             let mut buffer = [0u8; mem::size_of::<u8>()];
@@ -40,7 +39,7 @@ impl Parser {
             }
 
             match buffer[0] {
-                0x4C | 0x01 | 0x6A | 0x6B | 0x6C | 0x6D | 0x2F => {
+                0x4C | 0x01 | 0x6A | 0x6B | 0x6C | 0x6D | 0x6E | 0x2F => {
                     let mut value = [0u8; mem::size_of::<u32>()];
 
                     match self.reader.read_exact(&mut value) {
@@ -107,8 +106,6 @@ impl Parser {
                 0x04 => { instructions.push(Inst::Halt); },
                 _ => {},
             }
-
-            ip += 1;
         }
 
         Ok(instructions)
