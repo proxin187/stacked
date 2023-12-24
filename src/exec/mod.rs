@@ -2,6 +2,7 @@ use crate::{Inst, ExprKind, Jump, StackOp, MemOp, log, syscall::{self, Syscall}}
 
 use std::collections::HashMap;
 use std::fmt;
+use std::io;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Value {
@@ -98,10 +99,6 @@ impl Machine {
         while ip < instructions.len() as u32 {
             if self.debug {
                 log::info(&format!("Inst: {:?}", instructions[ip as usize]));
-                log::info(&format!("======"));
-                log::info(&format!("Stack: {:?}", self.stack));
-                log::info(&format!("Return: {:?}", self.ret_stack));
-                log::info(&format!("======"));
             }
 
             match &instructions[ip as usize] {
@@ -266,6 +263,17 @@ impl Machine {
                     }
                 },
                 Inst::Label(_) => (),
+            }
+
+            if self.debug {
+                log::info(&format!("======"));
+                log::info(&format!("Stack: {:?}", self.stack));
+                log::info(&format!("Return: {:?}", self.ret_stack));
+                log::info(&format!("======"));
+
+                let mut buf = String::new();
+
+                io::stdin().read_line(&mut buf).expect("failed to read stdin");
             }
 
             ip += 1;
