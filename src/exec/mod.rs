@@ -271,9 +271,17 @@ impl Machine {
                 log::info(&format!("Return: {:?}", self.ret_stack));
                 log::info(&format!("======"));
 
-                let mut buf = String::new();
+                loop {
+                    let mut buf = String::new();
 
-                io::stdin().read_line(&mut buf).expect("failed to read stdin");
+                    io::stdin().read_line(&mut buf).expect("failed to read stdin");
+
+                    if &buf == "mem\n" {
+                        println!("MEM: {:?}", &self.memory[0..30]);
+                    } else {
+                        break;
+                    }
+                }
             }
 
             ip += 1;
